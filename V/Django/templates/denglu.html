@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>登录</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    function val(event){
+        event.preventDefault(); // Prevent form submission
+
+        var name = window.document.getElementById("user").value;
+        var password = window.document.getElementById("password").value;
+
+        if (name == "" || password == ""){
+            window.alert("用户名或密码不能为空!");
+            return false;
+        }
+
+        // Send AJAX request to validate the credentials
+        $.ajax({
+            url: '/validate_login/', // URL to the backend view
+            type: 'POST',
+            data: {
+                'username': name,
+                'password': password,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.valid) {
+                    // If validation is successful, redirect to the specified URL
+                    window.location.href = 'http://127.0.0.1:8000/';
+                    // Close the current window
+                    setTimeout(function() {
+                        window.open('', '_self', '');
+                        window.close();
+                    }, 1000); // Delay to ensure redirection occurs first
+                } else {
+                    window.alert("用户名或密码错误!");
+                }
+            },
+            error: function(error) {
+                console.log(error);
+                window.alert("服务器错误，请稍后再试!");
+            }
+        });
+
+        return false; // Prevent form submission
+    }
+</script>
+<style type="text/css">
+    a{text-decoration:none}
+</style>
+</head>
+<body>
+<table border="0">
+    <tr>
+        <th width="2000" height="150" border="1" bgcolor="ccffff">
+            <center>
+                <table>
+                    <th></th>
+                    <th><font size="7" color="ff7517">地图系统</font></th>
+                </table>
+            </center>
+        </th>
+    </tr>
+</table>
+
+<table style="background-image:url(images/.jpg);background-size: 100%; opacity: 1; filter: alpha(opacity = 30)">
+    <tr>
+        <th>
+            <table border="0">
+                <tr>
+                    <th width="450" height="600" border="1"></th>
+                    <th>
+                        <table border="0" bgcolor="F0F0F0">
+                            <tr>
+                                <th width="12" height="45"></th>
+                                <th colspan="3" width="82" height="45" align="left">账户登录</th>
+                            </tr>
+                            <form onsubmit="return val(event);">
+                                <tr>
+                                    <th width="12" height="20"></th>
+                                    <th width="20" height="20">
+                                        <img src="images/7.png">
+                                    </th>
+                                    <th width="50" height="20">
+                                        <input type="text" style="height:40px" placeholder="手机号/会员号/邮箱地址" size="40" id="user">
+                                    </th>
+                                    <th width="12" height="20"></th>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" width="94" height="20"></th>
+                                </tr>
+                                <tr>
+                                    <th width="12" height="20"></th>
+                                    <th width="20" height="20">
+                                        <img src="images/8.png">
+                                    </th>
+                                    <th width="50" height="20">
+                                        <input type="password" style="height:40px" placeholder="📠" id="password" size="40">
+                                    </th>
+                                    <th width="12" height="20"></th>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" width="94" height="20"></th>
+                                </tr>
+                                <tr>
+                                    <th width="12" height="20"></th>
+                                    <th colspan="2" width="70" height="20" bgcolor="FF5809">
+                                        <input type="submit" style="background-color:FF5809;height:40px;width:140px;font-size:20px;color:white;border:none" value="登录">
+                                    </th>
+                                    <th width="12" height="20"></th>
+                                </tr>
+                            </form>
+                            <tr>
+                                <th colspan="4" width="94" height="20"></th>
+                            </tr>
+                            <tr>
+                                <th width="12" height="20"></th>
+                                <th width="70" height="20" colspan="2">
+                                    <img src="images/9.png">
+                                </th>
+                                <th width="12" height="20"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" width="94" height="6"></th>
+                            </tr>
+                            <tr>
+                                <th width="12" height="40"></th>
+                                <th colspan="2">
+                                    <table width="310" border="0">
+                                        <tr>
+                                            <th width="35" height="20" align="left">
+                                                <font size="2">忘记密码</font>
+                                            </th>
+                                            <th width="35" height="20" align="right">
+                                                <font size="2">
+                                                    <a href="http://127.0.0.1:8000/Zhuce/" target="_blank">免费注册</a>
+                                                </font>
+                                            </th>
+                                        </tr>
+                                    </table>
+                                </th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" width="94" height="6"></th>
+                            </tr>
+                        </table>
+                    </th>
+                </tr>
+            </table>
+        </th>
+    </tr>
+</table>
+</body>
+</html>
