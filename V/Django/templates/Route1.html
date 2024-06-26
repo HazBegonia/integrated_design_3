@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+  <title>位置经纬度 + 驾车规划路线</title>
+  <style type="text/css">
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #container {
+      position: relative;
+      width: 100%;
+      height: calc(100% - 80px); /* 让地图容器占据除按钮外的高度 */
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    #panel {
+      position: fixed;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+      z-index: 1;
+      display: none; /* 初始隐藏面板 */
+    }
+
+    #panel .amap-call {
+      background-color: #009cf9;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+
+    #panel .amap-lib-driving {
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      overflow: hidden;
+    }
+
+    button {
+      position: absolute;
+      bottom: 10px; /* 调整按钮位置 */
+      left: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 2; /* 确保按钮位于地图上层 */
+    }
+  </style>
+  <script type="text/javascript">
+    window._AMapSecurityConfig = {
+      securityJsCode: "b353e78b724a8f521b5283b63e31178d",
+    };
+  </script>
+  <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+  <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+  <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+</head>
+
+<body>
+  <button onclick="ReturnMap()" style="
+    position: relative;
+    top: 30px;
+    left: 10px;
+    width: 80px;
+    height: 40px; /* 让地图容器占据除按钮外的高度 */
+  ">返回</button>
+  <div id="container">
+    <div id="map"></div>
+    <button onclick="toggleMap()">显示地图和路线</button>
+  </div>
+  <div id="panel"></div>
+
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=5e314c8305b4ed2b92209b0de962c1d2&plugin=AMap.Driving"></script>
+  <script type="text/javascript">
+    var map = null;
+    var driving = null;
+
+    function ReturnMap() {
+      var address1 = "{{ address1 }}";
+      var address2 = "{{ address2 }}";
+      var travel_mode = "{{ travel_mode }}";
+      var preference = "{{ preference }}";
+      var avoid_highway = "{{ avoid_highway }}";
+
+      // 构造完整的 URL
+      var url = "http://127.0.0.1:8000/TR/"
+          + encodeURIComponent(address1) + "/"
+          + encodeURIComponent(address2) + "/"
+          + encodeURIComponent(travel_mode) + "/"
+          + encodeURIComponent(preference) + "/"
+          + encodeURIComponent(avoid_highway) + "/";
+      console.log(address1);
+      window.location.href = url;
+    }
+
+    function toggleMap() {
+      var mapContainer = document.getElementById('map');
+      var panel = document.getElementById('panel');
+
+      if (!map) {
+        // 如果地图未创建，创建地图并显示
+        map = new AMap.Map(mapContainer, {
+          resizeEnable: true,
+          center: [116.397428, 39.90923], // 地图初始中心点
+          zoom: 13 // 地图显示的缩放级别
+        });
+
+        // 设定驾车路线起始点和终点
+        var destination_longitude = {{ destination_longitude }};
+        var start_longitude = {{ start_longitude }};
+        var destination_latitude = {{ destination_latitude }};
+        var start_latitude = {{ start_latitude }};
+        var travel_mode = "{{ travel_mode }}";
+
+        driving = new AMap.Driving({
+          map: map,
+          panel: panel
+        });
+
+        driving.search(new AMap.LngLat(start_longitude, start_latitude), new AMap.LngLat(destination_longitude, destination_latitude), function(status, result) {
+          if (status === 'complete') {
+            console.log('绘制驾车路线成功');
+            map.setFitView(); // 调整地图视野，显示整条路线
+          } else {
+            console.error('获取驾车路线失败:', result);
+          }
+        });
+
+        // 显示地图容器和面板
+        mapContainer.style.display = 'block';
+        panel.style.display = 'block';
+
+        // 禁用按钮
+        toggleButton.disabled = true;
+        toggleButton.classList.add('disabled');
+      }
+    }
+  </script>
+</body>
+
+</html>
